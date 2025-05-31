@@ -12,15 +12,15 @@ export default function WatchedSummary({ watched, average }) {
         </p>
         <p>
           <span>⭐️</span>
-          <span>{parseFloat(avgImdbRating).toFixed(2)}</span>
+          <span>{avgImdbRating.toFixed(2)}</span>
         </p>
         <p>
           <span>🌟</span>
-          <span>{parseFloat(avgUserRating).toFixed(2)}</span>
+          <span>{avgUserRating.toFixed(2)}</span>
         </p>
         <p>
           <span>⏳</span>
-          <span>{parseFloat(avgRuntime).toFixed(2)} min</span>
+          <span>{avgRuntime.toFixed(2)} min</span>
         </p>
       </div>
     </div>

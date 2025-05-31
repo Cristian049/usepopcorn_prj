@@ -22,7 +22,7 @@ export default function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [selectedId, setSelectedId] = useState(null);
-  const [query, setQuery] = useState("inception");
+  const [query, setQuery] = useState("");
 
   function handleSelect(id) {
     setSelectedId((selectedId) => (id === selectedId ? null : id));
@@ -34,6 +34,10 @@ export default function App() {
 
   function handleAddWatcher(movie) {
     setWatched((watched) => [...watched, movie]);
+  }
+
+  function handleDeleteWatched(id) {
+    setWatched((watched) => watched.filter((movie) => movie.imdbID !== id));
   }
 
   useEffect(
@@ -54,8 +58,9 @@ export default function App() {
           if (data.Response === "False") throw new Error("Movie not found");
 
           setMovies(data.Search);
+          setError("");
         } catch (err) {
-          console.error(err.message);
+          console.log(err.message);
           setError(err.message);
         } finally {
           setIsLoading(false);
@@ -67,12 +72,11 @@ export default function App() {
         setError("");
         return;
       }
-
+      closeMovie();
       fetchMovies();
     },
     [query]
   );
-
   return (
     <>
       <NavBar>
@@ -97,11 +101,15 @@ export default function App() {
               selectedId={selectedId}
               closeMovie={closeMovie}
               onAddWatched={handleAddWatcher}
+              watched={watched}
             />
           ) : (
             <>
               <WatchedSummary watched={watched} average={average} />
-              <WatchedMovieList watched={watched} />
+              <WatchedMovieList
+                watched={watched}
+                onDeleteWatched={handleDeleteWatched}
+              />
             </>
           )}
         </Box>
