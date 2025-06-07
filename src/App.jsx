@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import ErrorMessage from "./ErrorMessage";
 import Loader from "./Loader";
 import NavBar from "./NavBar";
@@ -10,6 +10,8 @@ import WatchedSummary from "./WatchedSummary";
 import NumResults from "./NumResult";
 import Box from "./Box";
 import MainCont from "./MainCont";
+import { useMovies } from "./useMovies";
+import { useLocalStorageState } from "./useLocalStorageState";
 
 const average = (arr) =>
   arr.reduce((acc, cur, i, arr) => acc + cur / arr.length, 0);
@@ -17,12 +19,9 @@ const average = (arr) =>
 const KEY = "465b964d";
 
 export default function App() {
-  const [movies, setMovies] = useState([]);
-  const [watched, setWatched] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [selectedId, setSelectedId] = useState(null);
   const [query, setQuery] = useState("");
+  const [selectedId, setSelectedId] = useState(null);
+  const [watched, setWatched] = useLocalStorageState([], "watched");
 
   function handleSelect(id) {
     setSelectedId((selectedId) => (id === selectedId ? null : id));
@@ -34,49 +33,16 @@ export default function App() {
 
   function handleAddWatcher(movie) {
     setWatched((watched) => [...watched, movie]);
+
+    // localStorage.setItem("watched", JSON.stringify([...watched, movie]));
   }
 
   function handleDeleteWatched(id) {
     setWatched((watched) => watched.filter((movie) => movie.imdbID !== id));
   }
 
-  useEffect(
-    function () {
-      async function fetchMovies() {
-        try {
-          setIsLoading(true);
-          setError("");
-          const res = await fetch(
-            `http://www.omdbapi.com/?apikey=${KEY}&S=${query}`
-          );
+  const { movies, isLoading, error } = useMovies(query);
 
-          if (!res.ok)
-            throw new Error("Something went wrong with fetching movies");
-
-          const data = await res.json();
-
-          if (data.Response === "False") throw new Error("Movie not found");
-
-          setMovies(data.Search);
-          setError("");
-        } catch (err) {
-          console.log(err.message);
-          setError(err.message);
-        } finally {
-          setIsLoading(false);
-        }
-      }
-
-      if (query.length < 3) {
-        setMovies([]);
-        setError("");
-        return;
-      }
-      closeMovie();
-      fetchMovies();
-    },
-    [query]
-  );
   return (
     <>
       <NavBar>
